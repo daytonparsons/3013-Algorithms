@@ -1,1 +1,535 @@
+/*****************************************************************************
+ *
+ *  Author:           Dayton Parsons
+ *  Email:            Dayton.parsons@yahoo.com
+ *  Label:            P01
+ *  Title:            MyVector Class
+ *  Course:           CMPS 3013
+ *  Semester:         Spring 2024
+ *
+ *  Description:
+ *        this code defines a class named "MyVector" that provides overloaded operator methods for
+ *creating, modifying, and printing out a dynamic array of intergers. The class
+ *can be initialized with a linked list of integers or with values read in from
+ *a file. The class provides methods to insert elements or remove elements at
+ *the beginning, end, or at a specific location. The class also has a method to
+ *find the index of a given element with a specific value, and for printing the
+ *contents of the linked list to the console and to the output file "test.out".
+ *The main function created objects of the "Vector" class.
+ *
+ *
+ *
+ *  Usage:
+ *       - $ ./main filename
+ *       - This will read in a file containing whatever values to be read into
+ *our list/array.
+ *
+ *  Files:
+ *       main.cpp    : driver program
+ *       input.dat   : first file with our input in it
+ *       input1.dat  : second file with our input in it
+ *       input2.dat  : third file with our input in it
+ *       input3.dat  : fourth file with our input in it
+ *       test.out    : output file that will store the same contest we printed
+ *to the console
+ *
+ *****************************************************************************/
 
+#include <fstream>
+#include <iostream>
+#include <vector>
+
+using namespace std;
+
+
+
+/**
+ * Vector
+ *
+ * Description:
+ *      This class "Vector" creates a class based linked list that holds
+ *      initialized values and can also acquire more values from our input files.
+ *
+ * Public Methods:
+ *                          Vector() 
+ *      void                pushFront
+ *      void                pushRear
+ *      void                pushAt
+ *      void                inOrderPush
+ *      int                 popFront
+ *      int                 popRear()
+ *      int                 popAt(int loc)
+ *      int                 find(int val)
+ *      void                print()
+ *      void                printOutFile(ofstream &outFile)
+ *
+ *
+ * Private Methods:
+ * 
+ *
+ * 
+ *
+ */
+
+class Vector {
+public:
+  Vector() {}
+
+  Vector(const int *A, int size) {
+    for (int i = 0; i < size; i++) {
+      list.push_back(A[i]);
+    }
+  }
+
+  // for reading in values from a file
+  Vector(const string &FileName) {}
+
+  Vector(const Vector &other) { list = other.list; }
+
+// Add this public method to access the private member variable
+  vector<int> getList() const {
+    return list;
+  }
+
+
+  /*
+   * Public : pushFront
+   *
+   * Description:
+   *      Allows us to push integers onto the front of linked list
+   *
+   * Params:
+   *      int val :  value that we want to push onto the list
+   *
+   * Returns:
+   *      nothing, it is a void function
+   */
+  void pushFront(int val) { list.insert(list.begin(), val); }
+
+  void pushFront(const Vector &other) {
+    list.insert(list.begin(), other.list.begin(), other.list.end());
+  }
+
+
+  /*
+   * Public : pushRear
+   *
+   * Description:
+   *      Allows us to push integers onto the rear of linked list
+   *
+   * Params:
+   *      int val :  value that we want to push onto the list
+   *
+   * Returns:
+   *      nothing, it is a void function
+   */
+  void pushRear(int val) { list.push_back(val); }
+
+  void pushRear(const Vector &other) {
+    list.insert(list.end(), other.list.begin(), other.list.end());
+  }
+
+
+  /*
+   * Public : pushAt
+   *
+   * Description:
+   *      Allows us to push integers into the list "At" a location we specify
+   *
+   * Params:
+   *      int loc :  location inside the list we want to put val in
+   *      int val :  value that we want to push onto the list
+   *
+   * Returns:
+   *      nothing, it is a void function
+   */
+  void pushAt(int loc, int val) { list.insert(list.begin() + loc, val); }
+
+
+  /*
+   * Public : inOrderPush
+   *
+   * Description:
+   *      Allows us to push integers onto the linked list in order
+   *
+   * Params:
+   *      int val :  value that we want to push onto the list
+   *
+   * Returns:
+   *      nothing, it is a void function
+   */
+  void inOrderPush(int val) {
+    for (int i = 0; i < list.size(); i++) {
+      if (val < list[i]) {
+        list.insert(list.begin() + i, val);
+        return;
+      }
+    }
+    list.push_back(val);
+  }
+
+
+  /*
+   * Public : popFront
+   *
+   * Description:
+   *      Allows us to pop integers out at the front of linked list
+   *
+   * Params:
+   *      none, it acceses the list we created, directly
+   *
+   * Returns:
+   *      val :  it will return the list back how it was after it popped
+   */
+  int popFront() {
+    int val = list.front();
+    list.erase(list.begin());
+    return val;
+  }
+
+
+  /*
+   * Public : popRear
+   *
+   * Description:
+   *      Allows us to pop integers out at the rear of linked list
+   *
+   * Params:
+   *      none, it acceses the list we created, directly
+   *
+   * Returns:
+   *      val :  it will return the list back how it was after it popped
+   */
+  int popRear() {
+    int val = list.back();
+    list.pop_back();
+    return val;
+  }
+
+
+  /*
+   * Public : popAt
+   *
+   * Description:
+   *      Allows us to pop integers out "At" wherever we specify
+   *
+   * Params:
+   *      loc :  takes the location we specify in order to pop in that specific
+   * place
+   *
+   * Returns:
+   *      val :  it will return the list back how it was after it popped
+   */
+  int popAt(int loc) {
+    int val = list[loc];
+    list.erase(list.begin() + loc);
+    return val;
+  }
+
+
+  /*
+   * Public : find
+   *
+   * Description:
+   *      Allows us to find the location in the list (i) for any value we want
+   * to find
+   *
+   * Params:
+   *      val:  takes the value we want to find in the linked list
+   *
+   * Returns:
+   *      i:    returns the int i which is the location of the value we wanted
+   * to find
+   */
+  int find(int val) {
+    for (int i = 0; i < list.size(); i++) {
+      if (list[i] == val) {
+        return i;
+      }
+    }
+    return -1;
+  }
+
+
+  /*
+   * Public : print
+   *
+   * Description:
+   *      Allows us to print out the linked list and its values
+   *
+   * Params:
+   *      takes no parameters
+   *
+   * Returns:
+   *     nothing, it is a void function
+   */
+  void print() {
+    cout << "[";
+    for (int i = 0; i < list.size(); i++) {
+      cout << list[i];
+      if (i < list.size() - 1) {
+        cout << ", ";
+      }
+    }
+    cout << "]" << endl;
+  }
+
+
+  /*
+   * Public : printOutFile
+   *
+   * Description:
+   *      Allows us to print out the linked list to our output file and its
+   * values
+   *
+   * Params:
+   *      outFile :  takes the output file in order to print to it
+   *
+   * Returns:
+   *     nothing, it is a void function
+   */
+  void printOutFile(ofstream &outFile) {
+    outFile << "[";
+    for (int i = 0; i < list.size(); i++) {
+      outFile << list[i];
+      if (i < list.size() - 1) {
+        outFile << ", ";
+      }
+    }
+    outFile << "]" << endl;
+  }
+
+/*
+   * Public : printHeader
+   *
+   * Description:
+   *     Allows us to print out our header into the output file
+   * 
+   *
+   * Params:
+   *      outFile :  takes the output file in order to print to it
+   *
+   * Returns:
+   *     nothing, it is a void function
+   */
+void printHeader(ofstream &outFile) {
+  outFile << "Dayton Parsons - Program 2" << endl; 
+  outFile << " " << endl;
+}
+
+
+  /*
+   * Public : list
+   *
+   * Description:
+   *      this is where we will store our linked list
+   *
+   * Params:
+   *      int :  takes integers as we specify them (or from input file)
+   *
+   * Returns:
+   *     list : will return our list as we need it to
+   */
+  vector<int> list; 
+};
+
+
+/**
+ * MyVector
+ *
+ * Description:
+ *      This class "MyVector" is another class I created to overload operators in order to 
+ *      include some functionality we did not have before.
+ *
+ * Public Methods:
+ *             ostream       operator<< 
+ *             ofstream      operator<< 
+ *             MyVector      operator+
+ *             bool          operator==
+ *             MyVector&     operator=
+ *
+ * Private Methods:
+ * 
+ *
+ * 
+ *
+ */
+class MyVector {
+
+private:
+  Vector v;
+
+ int* data;
+ int size;
+
+
+
+public:
+
+vector<int> list;
+
+//overloading ostream to print to console more easily
+friend ostream& operator<<(ostream& cout, const MyVector& v) {
+    for (int i = 0; i < v.list.size(); i++) {
+      cout << v.list[i] << " ";
+    }
+    cout << endl;
+    return cout;
+  }
+
+//overloading ofstream to print to the outfile more easily
+friend ofstream& operator<<(ofstream& fout, const MyVector& v) {
+    for (int i = 0; i < v.list.size(); i++) {
+      fout << v.list[i] << " ";
+    }
+    fout << endl;
+    return fout;
+  }
+
+MyVector(int n) {
+        data = new int[n];
+        size = n;
+    }
+
+    // Copy constructor
+    MyVector(const MyVector& other) {
+        size = other.size;
+        data = new int[size];
+        for (int i = 0; i < size; i++) {
+            data[i] = other.data[i];
+        }
+    }
+
+    // Destructor
+    ~MyVector() {
+        delete[] data;
+    }
+
+    // Subscript operator
+    int& operator[](int index) {
+        return data[index];
+    }
+  MyVector() {}
+
+  MyVector(const int *A, int size) {
+    for (int i = 0; i < size; i++) {
+      list.push_back(A[i]);
+    }
+  }
+
+  // for reading in values from a file
+  //MyVector(const string &FileName) {}
+
+  //MyVector(const MyVector &other) { list = other.list; }
+
+  /*
+   * Overloaded operator +
+   *
+   * Description:
+   *      This operator allows us to add two MyVector objects together, element-wise.
+   *
+   * Params:
+   *      const MyVector& other : a reference to the MyVector object to add to this one
+   *
+   * Returns:
+   *      A new MyVector object that is the sum of the two input MyVector objects.
+   */
+ MyVector operator+(const MyVector& other) const {
+    MyVector result(*this);
+    if (other.list.size() != result.list.size()) {
+      cerr << "Error: vectors must have the same size to add." << endl;
+      return result;
+    }
+    for (int i = 0; i < result.list.size(); i++) {
+      result.list[i] += other.list[i];
+    }
+    return result;
+  }
+
+  /*
+   * Overloaded operator ==
+   *
+   * Description:
+   *      This operator allows us to check if two MyVector objects are equal to each other.
+   *
+   * Params:
+   *      const MyVector& other : a reference to the MyVector object to compare to this one
+   *
+   * Returns:
+   *      True if the two MyVector objects have the same elements in the same order, False otherwise.
+   */
+  bool operator==(const MyVector& other) const {
+    if (other.list.size() != list.size()) {
+      return false;
+    }
+    for (int i = 0; i < list.size(); i++) {
+      if (list[i] != other.list[i]) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  /*
+   * Overloaded assignment operator =
+   *
+   * Description:
+   *      This operator allows us to assign one MyVector object to another.
+   *
+   * Params:
+   *      const MyVector& other : a reference to the MyVector object to copy
+   *
+   * Returns:
+   *      A reference to the current MyVector object.
+   */
+  MyVector& operator=(const MyVector& other) {
+    if (this == &other) {
+      return *this;
+    }
+    list = other.list;
+    return *this;
+  }
+
+  
+};
+
+int main() {
+  
+int a1[] = { 1, 2, 3, 4, 5 };
+int a2[] = { 10, 20, 30 };
+
+MyVector v1(a1,5);
+MyVector v2(a2,3);
+
+ofstream outFile;
+outFile.open("output.txt");
+
+void printHeader(); 
+
+cout << v1[2] << endl;
+// writes out 3
+
+v1[4] = 9;
+// v1 now = [1,2,3,4,9]
+
+cout << v1 << endl;
+// writes out [1,2,3,4,9] to console.
+
+outFile << v1 << endl;
+// writes out [1,2,3,4,9] to your output file.
+
+MyVector v3 = v1 + v2;
+cout << v3 << endl;
+// writes out [11,22,33,4,9] to console.
+
+
+cout << (v2 == v1) << endl;
+// writes 0 to console (false) .
+
+MyVector v4 = v1;
+cout << (v4 == v1) << endl;
+// writes 1 to console (true) .
+
+
+return 0; 
+}
